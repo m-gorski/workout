@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout</title>
+    <style>
+    :root {
+        /* Colors */
+        --background-gradient: #112449;
+        --container-bg-color: #061023;
+        --text-color: #ffffff;
+        --label-color: #bdc3c7;
+        --input-bg-color: #2c3e50;
+        --input-border-color: #00a7ff;
+        --button-bg-color: #83a030;
+        --button-hover-bg-color: #2c3e50;
+        --button-active-bg-color: #00a7ff;
+        --highlight-color: #83a030;
+        --alert-color: #c0392b;
+        --alert-hover-color: #ab3c31;
+        --round-color: #e74c3c;
+        --exercise-timer-color: #3498db;
+
+        /* Font */
+        --font-family: Arial, sans-serif;
+        --font-size: 0.8em;
+
+        /* Layout */
+        --container-padding: 2em;
+        --button-padding: 0.75em;
+        --input-padding: 0.8em 1em;
+        --spacing-large: 1.5em;
+        --spacing-small: 0.5em;
+
+        /* Border */
+        --border-radius: 50px;
+		--border-radius-container: 30px;
+
+        /* Box Shadow */
+        --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-family);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: var(--background-gradient);
+        color: var(--text-color);
+    }
+
+    .container {
+        background-color: var(--container-bg-color);
+        border-radius: var(--border-radius-container);
+        padding: var(--container-padding);
+        max-width: 420px;
+        width: 100%;
+        box-shadow: var(--box-shadow);
+        color: var(--text-color);
+    }
+
+    .tab-buttons {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: var(--spacing-large);
+		gap: 20px;
+    }
+
+    .tab-buttons button {
+        background-color: var(--button-bg-color);
+        color: var(--text-color);
+        padding: var(--button-padding);
+        font-size: var(--font-size);
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .tab-buttons button.active {
+        background-color: var(--button-active-bg-color);
+    }
+
+    .tab-buttons button:hover {
+        background-color: var(--button-hover-bg-color);
+    }
+
+    .tab {
+        display: none;
+    }
+
+    .tab.active {
+        display: block;
+    }
+
+    .controls, .output, .exercise-timer {
+        margin-top: var(--spacing-large);
+    }
+
+    label {
+        color: var(--label-color);
+        font-size: 0.8em;
+        font-weight: 600;
+        margin-top: var(--spacing-large);
+        display: block;
+        text-transform: uppercase;
+    }
+
+    select, input[type="number"] {
+        width: 100%;
+        padding: var(--input-padding);
+        margin-top: var(--spacing-small);
+        background-color: var(--input-bg-color);
+        border: none;
+        border-radius: var(--border-radius);
+        color: var(--text-color);
+        font-size: var(--font-size);
+        outline: none;
+		border-right: 10px solid transparent;
+    }
+
+    button {
+        margin-top: var(--spacing-large);
+        padding: var(--button-padding);
+        width: 100%;
+        border: none;
+        border-radius: var(--border-radius);
+        background-color: var(--alert-color);
+        color: var(--text-color);
+        font-size: 0.9em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: var(--alert-hover-color);
+    }
+
+    #pauseResumeButton {
+        background-color: var(--highlight-color);
+        color: var(--text-color);
+        font-size: 0.9em;
+    }
+
+    #pauseResumeButton:hover {
+        background-color: #e67e22;
+    }
+
+    .output #timerDisplay, .output #result, .output #totalCombinations,
+    .exercise-timer #roundDisplay, .exercise-timer #exerciseTimerDisplay {
+        font-size: 1.6em;
+        font-weight: bold;
+        margin-top: var(--spacing-small);
+        color: var(--text-color);
+    }
+
+    .output #totalCombinations {
+        font-size: 1.2em;
+        color: var(--highlight-color);
+        margin-top: var(--spacing-large);
+    }
+
+    .exercise-timer #exerciseTimerDisplay {
+        font-size: 2em;
+        color: var(--exercise-timer-color);
+    }
+
+    .exercise-timer #roundDisplay {
+        font-size: 1.2em;
+        color: var(--round-color);
+        font-weight: 700;
+        margin-top: var(--spacing-large);
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Tab Buttons -->
+        <div class="tab-buttons">
+            <button class="active" onclick="showTab('kombinacje')">Kombinacje</button>
+            <button onclick="showTab('zegar')">Zegar do ćwiczeń</button>
+        </div>
+
+        <!-- Kombinacje Tab -->
+        <div id="kombinacje" class="tab active">
+            <div class="controls">
+                <label for="numCount">Liczba cyfr do losowania:</label>
+                <select id="numCount">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+
+                <label for="timer">Czas odliczania (s):</label>
+                <input type="number" id="timer" value="5" min="1">
+
+                <button id="startButton">Start</button>
+            </div>
+
+            <div class="output">
+                <div id="timerDisplay">0</div>
+                <div id="result"></div>
+                <div id="totalCombinations">Suma kombinacji: 0</div>
+            </div>
+        </div>
+
+        <!-- Zegar do ćwiczeń Tab -->
+        <div id="zegar" class="tab">
+            <div class="exercise-timer">
+                <label for="roundDuration">Długość Runda (s):</label>
+                <input type="number" id="roundDuration" value="30" min="1">
+                
+                <label for="breakDuration">Długość przerwy (s):</label>
+                <input type="number" id="breakDuration" value="10" min="1">
+
+                <button id="exerciseStartButton">Rozpocznij ćwiczenie</button>
+                <button id="pauseResumeButton" style="display: none;">Pauza</button>
+                
+                <div id="roundDisplay">Runda: 0</div>
+                <div id="exerciseTimerDisplay">Przerwa</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-buttons button').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-buttons button[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // Combination logic
+        let kombInterval;
+        let kombIsRunning = false;
+        let totalCombinations = 0;
+
+        document.getElementById("startButton").addEventListener("click", () => {
+            if (kombIsRunning) {
+                stopCombination();
+            } else {
+                startCombination();
+            }
+        });
+
+        function startCombination() {
+            kombIsRunning = true;
+            document.getElementById("startButton").innerText = "Stop";
+
+            const numCount = parseInt(document.getElementById("numCount").value);
+            let countdown = parseInt(document.getElementById("timer").value);
+            const timerDisplay = document.getElementById("timerDisplay");
+            const resultDisplay = document.getElementById("result");
+            const totalCombinationsDisplay = document.getElementById("totalCombinations");
+
+            resultDisplay.innerHTML = "";  // Clear previous results
+
+            kombInterval = setInterval(() => {
+                timerDisplay.innerHTML = countdown;
+                if (countdown === 0) {
+                    countdown = parseInt(document.getElementById("timer").value);
+                    const numbers = generateNumbers(numCount);
+                    resultDisplay.innerHTML = numbers.join(", ");
+                    totalCombinations++;
+                    totalCombinationsDisplay.innerHTML = `Suma kombinacji: ${totalCombinations}`;
+                } else {
+                    countdown--;
+                }
+            }, 1000);
+        }
+
+        function stopCombination() {
+            kombIsRunning = false;
+            clearInterval(kombInterval);
+            document.getElementById("startButton").innerText = "Start";
+            document.getElementById("timerDisplay").innerHTML = "0";
+        }
+
+        function generateNumbers(numCount) {
+            const numbers = [];
+            let lastParity = null;
+
+            while (numbers.length < numCount) {
+                const num = Math.floor(Math.random() * 7) + 1;
+                const currentParity = num % 2;
+
+                if (lastParity === null || lastParity !== currentParity) {
+                    numbers.push(num);
+                    lastParity = currentParity;
+                }
+            }
+            return numbers;
+        }
+
+        // Clock logic
+        function playSound(frequency, duration) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.type = "triangle";
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime );
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        let exerciseInterval;
+        let exerciseIsRunning = false;
+        let isPaused = false;
+        let countdown = 0;
+        let inBreak = true; // Start with a break as preparation time
+        let roundCount = 0;
+
+        document.getElementById("exerciseStartButton").addEventListener("click", () => {
+            if (exerciseIsRunning) {
+                stopExerciseTimer();
+            } else {
+                startExerciseTimer();
+            }
+        });
+
+        document.getElementById("pauseResumeButton").addEventListener("click", () => {
+            if (isPaused) {
+                resumeExerciseTimer();
+            } else {
+                pauseExerciseTimer();
+            }
+        });
+
+        function startExerciseTimer() {
+            exerciseIsRunning = true;
+            document.getElementById("exerciseStartButton").innerText = "Zatrzymaj";
+            document.getElementById("pauseResumeButton").style.display = "inline";
+
+            const roundDuration = parseInt(document.getElementById("roundDuration").value);
+            const breakDuration = parseInt(document.getElementById("breakDuration").value);
+            countdown = breakDuration;
+
+            updateDisplay();
+
+            exerciseInterval = setInterval(() => {
+                if (!isPaused) {
+                    if (countdown === 0) {
+                        if (inBreak) {
+                            playSound(500, 500);
+                            countdown = roundDuration;
+                            inBreak = false;
+                            roundCount++;
+                        } else {
+                            playSound(500, 500);
+                            countdown = breakDuration;
+                            inBreak = true;
+                        }
+                        updateDisplay();
+                    } else {
+                        countdown--;
+                    }
+                    document.getElementById("exerciseTimerDisplay").innerText = inBreak ? "Przerwa" : "Ćwiczenie";
+                    document.getElementById("exerciseTimerDisplay").innerText += `: ${countdown}`;
+                }
+            }, 1000);
+        }
+
+        function stopExerciseTimer() {
+            exerciseIsRunning = false;
+            clearInterval(exerciseInterval);
+            document.getElementById("exerciseStartButton").innerText = "Rozpocznij ćwiczenie";
+        }
+
+        function pauseExerciseTimer() {
+            isPaused = true;
+            document.getElementById("pauseResumeButton").innerText = "Wznów";
+        }
+
+        function resumeExerciseTimer() {
+            isPaused = false;
+            document.getElementById("pauseResumeButton").innerText = "Pauza";
+        }
+
+        function updateDisplay() {
+            document.getElementById("roundDisplay").innerText = `Runda: ${roundCount}`;
+        }
+    </script>
+</body>
+</html>
