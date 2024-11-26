@@ -12,10 +12,10 @@
         --text-color: #ffffff;
         --label-color: #bdc3c7;
         --input-bg-color: #2c3e50;
-        --input-border-color: #00a7ff;
+        --input-border-color: #e74c3c;
         --button-bg-color: #83a030;
         --button-hover-bg-color: #2c3e50;
-        --button-active-bg-color: #00a7ff;
+        --button-active-bg-color: #e74c3c;
         --highlight-color: #83a030;
         --alert-color: #c0392b;
         --alert-hover-color: #ab3c31;
@@ -23,7 +23,7 @@
         --exercise-timer-color: #3498db;
 
         /* Font */
-        --font-family: Arial, sans-serif;
+        --font-family: Calibri, sans-serif;
         --font-size: 0.8em;
 
         /* Layout */
@@ -180,6 +180,28 @@
         font-weight: 700;
         margin-top: var(--spacing-large);
     }
+	
+	@media(max-width: 767px){
+		body{
+			background-color: var(--container-bg-color);
+		}
+		
+		.container{
+			box-shadow: none;
+		}
+		
+		.tab-buttons button, #startButton, #exerciseStartButton{
+			font-size: 1rem;
+		}
+		
+		.output, #roundDisplay, #exerciseTimerDisplay{
+			text-align: center;
+		}
+		
+		.output #result{
+			font-size: 2.5rem;
+		}
+	}
 </style>
 </head>
 <body>
